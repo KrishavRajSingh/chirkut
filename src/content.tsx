@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
+import MapComponent from "~components/MapComponent";
 // Define interfaces for the Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -42,12 +43,30 @@ declare global {
   }
 }
 
+
 const CustomButton = () => {
   const [listening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState<string | null>(null);
+  const [showMap, setShowMap] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-
+  const [lon, setLon] = useState(0);
+  const [lat, setLat] = useState(0);
+  
+  function updateMap(location: string){
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data && data.length > 0) {
+          console.log(data[0].lat, data[0].lon);
+          const lat = data[0].lat;
+          setLat(lat);
+          const lon = data[0].lon;
+          setLon(lon);
+          setShowMap(true);
+        }
+      });
+  }
   // const processTranscript = useCallback((transcript: string) => {
   //   const lowerTranscript = transcript.toLowerCase();
   //   if (lowerTranscript.includes("next page")) {
@@ -94,6 +113,15 @@ const CustomButton = () => {
           // setIsListening(false);
         });
       }
+    } else if (lowerTranscript.includes("where is")){
+      const place = lowerTranscript.slice(8).trim();
+
+      updateMap(place);
+      if(recognitionRef.current){
+        recognitionRef.current.stop();
+      }
+      console.log(place);
+      
     }
   }, []);
   
@@ -148,9 +176,15 @@ const CustomButton = () => {
   }, [listening, handleSpeechResult]);
 
   return (
-    <div style={{color: "yellow", position: "fixed", bottom: "1rem"}}>
+    <div style={{color: "yellow", position: "fixed", bottom: "1rem", right: "1rem"}}>
+      {/* {showMap && <MapComponent lon={lon} lat={lat}/>  }   */}
+      {showMap && 
+      <div style={{display: "flex"}}>
+        {/* <button style={{position: "fixed", top: "1rem", color: "red"}} onClick={() => setShowMap(false)}>CLOSE MAP</button> */}
+        <MapComponent lon={lon} lat={lat} setShowMap={setShowMap}/>
+      </div>}
+       {/* <MapPopup location="patna" /> */}
       <p>{transcript}</p>
-      {/* <MapPopup location="patna" /> */}
       <button
         style={{ height: "3rem" }}
         onClick={() => setIsListening(!listening)}>

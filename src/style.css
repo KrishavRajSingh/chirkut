@@ -1,0 +1,11 @@
+.leaflet-container{
+    height: 50vh;
+  }
+  
+  .map {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 50vw;
+    height: 50vh;
+  }

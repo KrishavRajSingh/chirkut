@@ -15,5 +15,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if(request.payload)
       chrome.tabs.create({url: `https://www.google.com/search?q=${request.payload}`});
       sendResponse('searched');
+    } else if(request.action === "searchPlace"){
+      console.log('searching', request.payload);
+      if(request.payload)
+      chrome.tabs.create({url: `https://www.google.com/maps/search/${request.payload}`});
+      // window.open(`https://www.google.com/maps/search/${request.payload}`);
+      sendResponse('searched');
     }
   });
