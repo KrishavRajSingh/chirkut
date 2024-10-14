@@ -1,3 +1,5 @@
+import { askGemini } from "~services/geminiService";
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "switchToNextTab") {
       chrome.tabs.query({ currentWindow: true }, (tabs) => {
@@ -21,5 +23,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       chrome.tabs.create({url: `https://www.google.com/maps/search/${request.payload}`});
       // window.open(`https://www.google.com/maps/search/${request.payload}`);
       sendResponse('searched');
+    } else if(request.action === "askGemini"){
+      console.log('asking gemini', request.prompt);
+      if(request.prompt)
+      askGemini(request.prompt).then((response) => {
+        console.log(response, 'background');
+        sendResponse(response);
+      });
     }
   });

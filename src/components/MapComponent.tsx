@@ -41,7 +41,7 @@ const MapComponent = ({lon, lat, setShowMap}) => {
   }, [lon, lat]);
 
   return <div style={{position: "fixed",
-    top: "15rem",
+    top: "8rem",
     bottom: 0,
     left: "25vw",}}>
       <div style={{display: "flex", backgroundColor: "floralwhite", color: "black", justifyContent: "space-between"}}>

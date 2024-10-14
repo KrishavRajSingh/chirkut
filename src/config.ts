@@ -1,0 +1,1 @@
+export const GEMINI_API_KEY = process.env.PLASMO_PUBLIC_GEMINI_API_KEY;

@@ -1,5 +1,12 @@
 {
   "name": "bun",
+  "plasmo": {
+    "env": {
+      "PLASMO_PUBLIC_GEMINI_API_KEY": {
+        "description": "Gemini API Key"
+      }
+    }
+  },
   "displayName": "Bun",
   "version": "0.0.1",
   "description": "browser assistant",
@@ -14,7 +21,9 @@
     "build:next": "next build"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@types/ol": "^7.0.0",
+    "dotenv": "^16.4.5",
     "leaflet": "^1.9.4",
     "lucide": "^0.441.0",
     "lucide-react": "^0.441.0",

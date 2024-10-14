@@ -2,6 +2,9 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
 import MapComponent from "~components/MapComponent";
+import { askGemini } from "~services/geminiService";
+import dotenv from 'dotenv';
+dotenv.config();
 // Define interfaces for the Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -52,6 +55,7 @@ const CustomButton = () => {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [lon, setLon] = useState(0);
   const [lat, setLat] = useState(0);
+  const [modal, setModal] = useState(null);
   
   function updateMap(location: string){
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
@@ -85,7 +89,7 @@ const CustomButton = () => {
   //   }
   // }, []);
 
-  const processTranscript = useCallback((transcript: string) => {
+  const processTranscript = useCallback( async (transcript: string) => {
     const lowerTranscript = transcript.toLowerCase();
     
     if (lowerTranscript.includes("next tab")) {
@@ -121,6 +125,20 @@ const CustomButton = () => {
         recognitionRef.current.stop();
       }
       console.log(place);
+      
+    } else {
+      console.log(process.env.PLASMO_PUBLIC_GEMINI_API, "ko");
+      
+      // const res = await askGemini(lowerTranscript);
+      chrome.runtime.sendMessage({action: "askGemini", prompt: lowerTranscript}, (response) => {
+        console.log(response);
+          setModal(response);
+          // Stop listening once the search action is triggered
+          if (recognitionRef.current) {
+            recognitionRef.current.stop();
+          }
+      });
+      // console.log(res, 'hi');
       
     }
   }, []);
@@ -177,13 +195,24 @@ const CustomButton = () => {
 
   return (
     <div style={{color: "yellow", position: "fixed", bottom: "1rem", right: "1rem"}}>
-      {/* {showMap && <MapComponent lon={lon} lat={lat}/>  }   */}
       {showMap && 
       <div style={{display: "flex"}}>
-        {/* <button style={{position: "fixed", top: "1rem", color: "red"}} onClick={() => setShowMap(false)}>CLOSE MAP</button> */}
         <MapComponent lon={lon} lat={lat} setShowMap={setShowMap}/>
       </div>}
-       {/* <MapPopup location="patna" /> */}
+      {modal && <div style={{
+      maxWidth: "15rem",
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      backgroundColor: "black",
+      color: "white",
+      padding: "1rem",
+      display: "flex",
+      flexDirection: "column",
+    }}>
+      <button onClick={() => setModal(null)} style={{backgroundColor: "red", width: '2rem', textAlign: "center"}}>X</button>
+      {modal}</div>}
       <p>{transcript}</p>
       <button
         style={{ height: "3rem" }}
