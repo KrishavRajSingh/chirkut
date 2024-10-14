@@ -71,23 +71,6 @@ const CustomButton = () => {
         }
       });
   }
-  // const processTranscript = useCallback((transcript: string) => {
-  //   const lowerTranscript = transcript.toLowerCase();
-  //   if (lowerTranscript.includes("next page")) {
-  //     console.log('Sending message to switch tab');
-  //     chrome.runtime.sendMessage({ action: "switchToNextTab" });
-  //   } else if (lowerTranscript.startsWith("search")) {
-  //     const searchQuery = transcript.slice(6).trim();
-  //     if (searchQuery) {
-  //       console.log('Sending message to open new tab', searchQuery);
-  //       chrome.runtime.sendMessage({ action: "searchInNewTab", payload: searchQuery }, (response) => {
-  //         console.log(response);
-  //         // if(response)
-  //         //   setIsListening(false);
-  //       });
-  //     }
-  //   }
-  // }, []);
 
   const processTranscript = useCallback( async (transcript: string) => {
     const lowerTranscript = transcript.toLowerCase();
@@ -131,7 +114,10 @@ const CustomButton = () => {
       
       // const res = await askGemini(lowerTranscript);
       chrome.runtime.sendMessage({action: "askGemini", prompt: lowerTranscript}, (response) => {
-        console.log(response);
+          console.log(response);
+          let utterance = new SpeechSynthesisUtterance(response);
+          speechSynthesis.speak(utterance);
+
           setModal(response);
           // Stop listening once the search action is triggered
           if (recognitionRef.current) {
