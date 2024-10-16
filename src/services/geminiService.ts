@@ -29,9 +29,42 @@ Answer the above question following the guidelines provided. Remember to be conc
 `;
 }
 
+const functionPromptTemplate = (user_command: string) => {
+   return `# System Context
+You are a voice command interpreter. Your role is to match user voice commands to predefined functions. You must respond ONLY with a JSON object containing the function name and any parameters. Never include explanations or additional text.
+
+# Available Functions
+- goToNextTab(): Switches to the next browser tab
+- goToPreviousTab(): Switches to the previous browser tab
+- scrollUp(pixels?: number): Scrolls the page up, optionally by specified pixels
+- scrollDown(pixels?: number): Scrolls the page down, optionally by specified pixels
+- closeTab(): Closes the current tab
+- newTab(): Opens a new tab
+
+# Response Format
+{
+    "function": "functionName",
+    "parameters": {
+        "paramName": "paramValue"
+    }
+}
+
+# Input
+${user_command}
+
+# Rules
+1. If the command doesn't match any function exactly, choose the closest matching function
+2. If no function matches at all, return {"function": "unknown"}
+3. For scroll commands without specific pixels, omit the parameters object
+4. Numbers mentioned in the command should be converted to parameters
+5. Always return valid JSON`
+};
+
 export async function askGemini(prompt: string) {
     try {
-        const result = await model.generateContent(promptTemplate(prompt));
+        console.log(prompt, "serving");
+        
+        const result = await model.generateContent(functionPromptTemplate(prompt));
         console.log(result.response.text(), 'service');
         
         return result.response.text();
