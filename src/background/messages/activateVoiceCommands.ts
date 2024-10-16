@@ -1,6 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 import { Storage } from "@plasmohq/storage";
-import { scrollDown } from "~utils/lib";
+
 const storage = new Storage()  ;
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     

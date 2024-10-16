@@ -37,26 +37,32 @@ export const previousTab = () => switchTab('previous');
 //         chrome.tabs.update(tabs[previousTabIndex].id!, { active: true });
 //     })
 // }
-
+// function scrollPageFunction(direction: ScrollDirection, pixels: number) {
+//     window.scrollBy({
+//       top: direction === 'up' ? -pixels : pixels,
+//       behavior: 'smooth'
+//     });
+//   }
+  
 const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<void> => {
-    try{
-        const [activeTab] = await chrome.tabs.query({active: true, currentWindow: true});
-        if(!activeTab.id) return;
-        
-        const scrollAmount = pixels || 100;
-        const scrollScript = `window.scrollBy({top: ${direction === 'up' ? -scrollAmount : scrollAmount}, behavior: 'smooth'})`;
-
+    try {
+        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!activeTab.id) return;
+    
         await chrome.scripting.executeScript({
-            target: {tabId: activeTab.id},
-            func:   (scrollScript) => {
-                eval(scrollScript);
-            },
-            args: [scrollScript]
-        })
-    }catch(err){
-        console.error(`Error scrolling ${direction} direction`, err);
-        throw err;
-    }
+          target: { tabId: activeTab.id },
+          func: (direction: ScrollDirection, pixels: number) => {
+            window.scrollBy({
+                top: direction === 'up' ? -pixels : pixels,
+                behavior: 'smooth'
+            });
+          },
+          args: [direction, pixels ?? window.innerHeight]
+        });
+      } catch (error) {
+        console.error(`Error scrolling ${direction}:`, error);
+        throw error;
+      }
 };
 
 export const scrollUp = (pixels?: number) => scrollPage('up', pixels);

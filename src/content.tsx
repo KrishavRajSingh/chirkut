@@ -2,10 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
 import MapComponent from "~components/MapComponent";
-import { askGemini } from "~services/geminiService";
-import Button from "~components/Button";
-// import dotenv from 'dotenv';
-// dotenv.config();
 // Define interfaces for the Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -181,7 +177,7 @@ const CustomButton = () => {
   }, [listening, handleSpeechResult]);
 
   let popup: HTMLDivElement | null = null;
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     console.log("reques in content", request.action);
     
     if (request.action === "showButton") {
