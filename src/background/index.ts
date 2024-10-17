@@ -1,43 +1,5 @@
 import { askGemini } from "~services/geminiService";
 import { Storage } from "@plasmohq/storage"
-// interface SpeechRecognitionEvent extends Event {
-//   results: SpeechRecognitionResultList;
-// }
-
-// interface SpeechRecognitionResultList {
-//   [index: number]: SpeechRecognitionResult;
-//   length: number;
-// }
-
-// interface SpeechRecognitionResult {
-//   [index: number]: SpeechRecognitionAlternative;
-//   length: number;
-//   isFinal: boolean;
-// }
-
-// interface SpeechRecognitionAlternative {
-//   transcript: string;
-//   confidence: number;
-// }
-// interface SpeechRecognition extends EventTarget {
-//   continuous: boolean;
-//   interimResults: boolean;
-//   onresult: (event: SpeechRecognitionEvent) => void;
-//   onend: () => void;
-//   start: () => void;
-//   stop: () => void;
-// }
-
-// declare global {
-//   interface Window {
-//     SpeechRecognition: {
-//       new (): SpeechRecognition;
-//     };
-//     webkitSpeechRecognition: {
-//       new (): SpeechRecognition;
-//     };
-//   }
-// }
 const storage = new Storage();
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -72,32 +34,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
     }
   });
-  let recognition: any;
-  var window = window ?? self;
+  
+  let id;
 chrome.runtime.onInstalled.addListener(async () => {
   console.log('installed');
-  const tab = await chrome.tabs.create({ url: "tabs/voice-listener.html", pinned: true })
-  await storage.set("listenerTabId", tab.id)
-  // recognition = new (window as any).webkitSpeechRecognition();
-  // recognition.continuous = true;
-  // recognition.interimResults = false;
-
-  // recognition.onstart = () => {
-  //   console.log("Speech recognition started");
-  // };
-
-  // recognition.onresult = (event: any) => {
-  //   const last = event.results.length - 1;
-  //   const command = event.results[last][0].transcript.toLowerCase();
-    
-  //   if (command.includes("hey bunny")) {
-  //     console.log("Command: ", command);     
-  //   }
-  // };
+  const tab = await chrome.tabs.create({ url: "tabs/voice-listener.html", pinned: true });
+  id = tab.id;
+  await storage.set("listenerTabId", tab.id);
 });
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
-    const listenerTabId = await storage.get("listenerTabId")
+    const listenerTabId = id;
     console.log(tabId, listenerTabId, "backIndex");
     
     if (tabId === Number(listenerTabId)) {

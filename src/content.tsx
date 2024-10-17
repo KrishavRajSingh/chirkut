@@ -131,7 +131,7 @@ const CustomButton = () => {
     setTranscript(currentTranscript);
     console.log(currentTranscript, 'hi');
     
-    chrome.runtime.sendMessage({ action: "updateTranscript", transcript: currentTranscript });
+    // chrome.runtime.sendMessage({ action: "updateTranscript", transcript: currentTranscript });
     // chrome.runtime.onMessage()
     // Clear any existing timeout
     if (timeoutRef.current) {
