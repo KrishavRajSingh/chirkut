@@ -14,35 +14,6 @@ const switchTab = (direction: Switchdirection) => {
 
 export const nextTab = () => switchTab('next');
 export const previousTab = () => switchTab('previous');
-
-// export const nextTab = () => {
-//     chrome.tabs.query({ currentWindow: true }, (tabs) => {
-//         if (tabs.length <= 1) return;
-//         console.log(tabs.findIndex(tab => tab.active));
-        
-//         const activeTabIndex = tabs.findIndex(tab => tab.active);
-//         const nextTabIndex = (activeTabIndex + 1) % tabs.length;
-        
-//         chrome.tabs.update(tabs[nextTabIndex].id!, { active: true });
-//     });
-// }
-
-// export const previousTab = () => {
-//     chrome.tabs.query({currentWindow: true}, (tabs) => {
-//         if(tabs.length <= 1) return;
-
-//         const activeTabIndex = tabs.findIndex(tab => tab.active);
-//         const previousTabIndex = (activeTabIndex - 1 + tabs.length) % tabs.length;
-
-//         chrome.tabs.update(tabs[previousTabIndex].id!, { active: true });
-//     })
-// }
-// function scrollPageFunction(direction: ScrollDirection, pixels: number) {
-//     window.scrollBy({
-//       top: direction === 'up' ? -pixels : pixels,
-//       behavior: 'smooth'
-//     });
-//   }
   
 const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<void> => {
     try {
@@ -52,12 +23,13 @@ const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<
         await chrome.scripting.executeScript({
           target: { tabId: activeTab.id },
           func: (direction: ScrollDirection, pixels: number) => {
+            pixels = pixels || window.innerHeight;
             window.scrollBy({
                 top: direction === 'up' ? -pixels : pixels,
                 behavior: 'smooth'
             });
           },
-          args: [direction, pixels ?? window.innerHeight]
+          args: [direction, pixels ?? 0]
         });
       } catch (error) {
         console.error(`Error scrolling ${direction}:`, error);
@@ -67,3 +39,33 @@ const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<
 
 export const scrollUp = (pixels?: number) => scrollPage('up', pixels);
 export const scrollDown = (pixels?: number) => scrollPage('down', pixels);
+
+// Define a more precise type for the response
+type GeminiResponse = {
+  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown';
+  parameters?: { [key: string]: any };
+};
+
+// Define the executeCommand function with the appropriate types
+export const executeCommand = async (response: GeminiResponse): Promise<void> => {
+  try {
+    switch (response.function) {
+      case 'nextTab':
+        await nextTab();
+        break;
+      case 'previousTab':
+        await previousTab();
+        break;
+      case 'scrollUp':
+        await scrollUp(response.parameters?.pixels);
+        break;
+      case 'scrollDown':
+        await scrollDown(response.parameters?.pixels);
+        break;
+      default:
+        console.error(`Unknown function: ${response.function}`);
+    }
+  } catch (error) {
+    console.error(`Error executing command: ${response.function}`, error);
+  }
+};

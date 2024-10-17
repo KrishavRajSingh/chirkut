@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { GEMINI_API_KEY } from '../config';
 
 const genAi = new GoogleGenerativeAI(process.env.PLASMO_PUBLIC_GEMINI_API);
 
@@ -34,10 +33,10 @@ const functionPromptTemplate = (user_command: string) => {
 You are a voice command interpreter. Your role is to match user voice commands to predefined functions. You must respond ONLY with a JSON object containing the function name and any parameters. Never include explanations or additional text.
 
 # Available Functions
-- goToNextTab(): Switches to the next browser tab
-- goToPreviousTab(): Switches to the previous browser tab
-- scrollUp(pixels?: number): Scrolls the page up, optionally by specified pixels
-- scrollDown(pixels?: number): Scrolls the page down, optionally by specified pixels
+- nextTab(): Switches to the next browser tab
+- previousTab(): Switches to the previous browser tab
+- scrollUp(pixels?: number): Scrolls the page up, optionally by specified pixels. Default pixel is window.innerHeight
+- scrollDown(pixels?: number): Scrolls the page down, optionally by specified pixels. Default pixel is window.innerHeight
 - closeTab(): Closes the current tab
 - newTab(): Opens a new tab
 
@@ -60,7 +59,7 @@ ${user_command}
 5. Always return valid JSON`
 };
 
-export async function askGemini(prompt: string) {
+export async function askGemini(prompt: string): Promise<string> {
     try {
         console.log(prompt, "serving");
         
@@ -70,6 +69,6 @@ export async function askGemini(prompt: string) {
         return result.response.text();
     } catch (error) {
         console.error('Error calling Gemini API:', error);
-        throw error; // or handle it as appropriate for your application
+        throw error;
     }
 }
