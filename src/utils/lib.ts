@@ -15,15 +15,15 @@ const switchTab = (direction: Switchdirection) => {
 export const nextTab = () => switchTab('next');
 export const previousTab = () => switchTab('previous');
   
-const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<void> => {
+const scrollPage = async (direction: ScrollDirection, pixels?: number | "max"): Promise<void> => {
     try {
         const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
         if (!activeTab.id) return;
     
         await chrome.scripting.executeScript({
           target: { tabId: activeTab.id },
-          func: (direction: ScrollDirection, pixels: number) => {
-            pixels = pixels || window.innerHeight;
+          func: (direction: ScrollDirection, pixels: number | "max") => {
+            pixels = pixels === "max" ? (document.body.scrollHeight || document.scrollingElement.scrollHeight) : pixels || window.innerHeight;
             window.scrollBy({
                 top: direction === 'up' ? -pixels : pixels,
                 behavior: 'smooth'
@@ -37,12 +37,23 @@ const scrollPage = async (direction: ScrollDirection, pixels?: number): Promise<
       }
 };
 
-export const scrollUp = (pixels?: number) => scrollPage('up', pixels);
-export const scrollDown = (pixels?: number) => scrollPage('down', pixels);
+export const scrollUp = (pixels?: number | "max") => scrollPage('up', pixels);
+export const scrollDown = (pixels?: number | "max") => scrollPage('down', pixels);
+
+export const closeTab = async(): Promise<void> => {
+  try{
+    const [activeTab] = await chrome.tabs.query({active: true, currentWindow: true});
+    if(activeTab.id)
+      await chrome.tabs.remove(activeTab.id);
+  }catch (error) {
+    console.error("Error closing tab", error);
+    throw error;
+  }
+}
 
 // Define a more precise type for the response
 type GeminiResponse = {
-  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown';
+  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown' | 'closeTab';
   parameters?: { [key: string]: any };
 };
 
@@ -51,19 +62,21 @@ export const executeCommand = async (response: GeminiResponse): Promise<void> =>
   try {
     switch (response.function) {
       case 'nextTab':
-        await nextTab();
+        nextTab();
         break;
       case 'previousTab':
-        await previousTab();
+        previousTab();
         break;
       case 'scrollUp':
-        await scrollUp(response.parameters?.pixels);
+        await scrollUp(response.parameters?.fullPage ? 'max' : response.parameters?.pixels);
         break;
       case 'scrollDown':
-        await scrollDown(response.parameters?.pixels);
+        await scrollDown(response.parameters?.fullPage ? 'max' : response.parameters?.pixels);
         break;
+      case 'closeTab':
+        await closeTab();
       default:
-        console.error(`Unknown function: ${response.function}`);
+        console.warn(`Unknown function: ${response.function}`);
     }
   } catch (error) {
     console.error(`Error executing command: ${response.function}`, error);
