@@ -3,8 +3,7 @@ import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
 import MapComponent from "~components/MapComponent";
 import { askGemini } from "~services/geminiService";
-import dotenv from 'dotenv';
-dotenv.config();
+
 // Define interfaces for the Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
