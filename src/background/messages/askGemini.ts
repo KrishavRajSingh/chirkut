@@ -2,7 +2,7 @@ import type { PlasmoMessaging } from "@plasmohq/messaging";
 import { askGemini } from "~services/geminiService";
 import { executeCommand } from "~utils/lib";
 type GeminiResponse = {
-    function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown';
+    function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown' | 'closeTab' | 'openWebsite';
     parameters?: { [key: string]: any };
   };
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
@@ -11,7 +11,9 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
         console.log("Gemini message received", message);
         const geminiResponse: GeminiResponse = JSON.parse(await askGemini(message));
         console.log("answer from gemini", geminiResponse);
-        await executeCommand(geminiResponse)
+        // chrome.runtime.sendMessage({request});
+        await executeCommand(geminiResponse);
+        // chrome.tts.speak('done');
         res.send({ success: true, data: geminiResponse });
 
     } catch (error) {

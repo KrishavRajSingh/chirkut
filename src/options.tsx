@@ -1,32 +1,50 @@
-import { useState } from "react"
-let recognition: any;
-function OptionsIndex() {
-  const [data, setData] = useState("")
-    recognition = new (window as any).webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = false;
+import React, { useEffect, useState } from 'react';
 
-  recognition.onstart = () => {
-    console.log("Speech recognition started");
-  };
+const OptionsPage: React.FC = () => {
+    const [voices, setVoices] = useState<chrome.tts.TtsVoice[]>([]);
 
-  recognition.onresult = (event: any) => {
-    const last = event.results.length - 1;
-    const command = event.results[last][0].transcript.toLowerCase();
-    
-    if (command.includes("hey bunny")) {
-      console.log("Command: ", command);     
-    }
-  };
-  return (
-    <div>
-      <h1>
-        Welcome to your <a href="https://www.plasmo.com">Plasmo</a> Extension!
-      </h1>
-      <h2>This is the Option UI page!</h2>
-      <input onChange={(e) => setData(e.target.value)} value={data} />
-    </div>
-  )
-}
+    // Function to populate voices
+    const populateVoices = () => {
+        chrome.tts.getVoices((availableVoices) => {
+            setVoices(availableVoices);
+        });
+    };
 
-export default OptionsIndex
+    // Function to test the selected voice
+    const testVoice = (voiceName: string) => {
+        chrome.tts.speak(`Testing the voice: ${voiceName}`, {
+            voiceName: voiceName,
+        });
+    };
+
+    // Populate voices on component mount
+    useEffect(() => {
+        populateVoices();
+    }, []);
+
+    return (
+        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+            <h1>Text-to-Speech Voice Tester</h1>
+            <ul style={{ listStyleType: 'none', padding: 0 }}>
+                {voices.map((voice) => (
+                    <li
+                        key={voice.voiceName}
+                        onClick={() => testVoice(voice.voiceName)}
+                        style={{
+                            padding: '10px',
+                            border: '1px solid #ccc',
+                            marginBottom: '5px',
+                            cursor: 'pointer',
+                            borderRadius: '5px',
+                            backgroundColor: '#f9f9f9',
+                        }}
+                    >
+                        {voice.voiceName} ({voice.lang})
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+export default OptionsPage;

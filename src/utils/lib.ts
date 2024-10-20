@@ -53,13 +53,15 @@ export const closeTab = async(): Promise<void> => {
 
 // Define a more precise type for the response
 type GeminiResponse = {
-  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown' | 'closeTab';
+  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown' | 'closeTab' 
+  | 'openWebsite';
   parameters?: { [key: string]: any };
 };
 
 // Define the executeCommand function with the appropriate types
 export const executeCommand = async (response: GeminiResponse): Promise<void> => {
   try {
+    let notifyUser = true;
     switch (response.function) {
       case 'nextTab':
         nextTab();
@@ -75,9 +77,17 @@ export const executeCommand = async (response: GeminiResponse): Promise<void> =>
         break;
       case 'closeTab':
         await closeTab();
+        break;
+      case 'openWebsite':
+        if (response.parameters?.url) {
+            chrome.tabs.create({ url: response.parameters.url });
+        }
+        break;
       default:
         console.warn(`Unknown function: ${response.function}`);
+        notifyUser = false;
     }
+    chrome.tts.speak("done");
   } catch (error) {
     console.error(`Error executing command: ${response.function}`, error);
   }
