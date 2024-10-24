@@ -12,7 +12,12 @@ const OptionsPage: React.FC = () => {
 
     // Function to test the selected voice
     const testVoice = (voiceName: string) => {
-        chrome.tts.speak(`Testing the voice: ${voiceName}`, {
+        chrome.tts.speak(`Based on the YouTube page you're viewing, here are the coding videos:
+• How to code like a pro, 22M views, 3 years ago
+• The Final Project (Landing Page and Chat App with React) | JavaScript JOB READY Free Course (2024), 218 views, 2 days ago
+• Rust Programming Language for JS Devs | Rust VS Javascript, 22K views, 2 months ago
+• Claude has taken control of my computer..., 363K views, 10 hours ago 
+• How is it to work at Microsoft?, 47K views, 5 years ago `, {
             voiceName: voiceName,
         });
     };

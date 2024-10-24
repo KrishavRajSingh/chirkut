@@ -1,0 +1,29 @@
+/* Class = "NSMenuItem"; title = "Quit Installer"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "Esci dall'Installatore";
+
+/* Class = "NSMenuItem"; title = "About Installer"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "Informazioni sull'Installatore";
+
+/* Class = "NSTextFieldCell"; title = "Initializing…"; ObjectID = "8bt-JL-ZHQ"; */
+"8bt-JL-ZHQ.title" = "Inizializzazione…";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "Menu Principale";
+
+/* Class = "NSWindow"; title = "Installer"; ObjectID = "IQv-IB-iLA"; */
+"IQv-IB-iLA.title" = "Installatore";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "Mostra Tutto";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "Servizi";
+
+/* Class = "NSMenuItem"; title = "Hide Installer"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "Nascondi Installatore";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "Nascondi Altri";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "Servizi";

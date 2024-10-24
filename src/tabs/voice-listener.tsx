@@ -3,6 +3,7 @@ import { sendToBackground } from "@plasmohq/messaging";
 import { closeTab, previousTab, scrollDown, scrollUp, nextTab } from "~utils/lib";
 import next from "next";
 import { set } from "ol/transform";
+import { sendResponse } from "next/dist/server/image-optimizer";
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -50,7 +51,7 @@ const VoiceListener = () => {
 
   const handleRecognition = async (reckognize: boolean): Promise<void> => {
     const res = await sendToBackground({name: "activateVoiceCommands", body:{  voiceActivated: reckognize } });
-    console.log("res", res);
+    console.log("res", reckognize);
     
     if(res.success)
       setListening(reckognize);
@@ -68,7 +69,6 @@ const VoiceListener = () => {
       await scrollDown();
     } else if (lowerTranscript.includes("close tab")){
       await closeTab();
-    
     } else {
       const prompt = lowerTranscript.trim();
       await sendToBackground({ name: "askGemini", body: prompt });
@@ -112,7 +112,20 @@ const VoiceListener = () => {
         processTranscript(currentTranscript);
     // }, 2000);
   };
-
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "restartListening"){
+      // if(recognitionRef.current){
+        // console.log("lis", request.listening);
+        
+        // if(request.listening)
+        // recognitionRef.current.stop();
+        console.log("yay");
+        sendResponse("ok")
+        // else
+        recognitionRef.current.stop();
+      // }
+    }
+  })
   useEffect(() => {
     // if(!listening) {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;

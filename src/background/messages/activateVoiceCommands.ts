@@ -3,13 +3,13 @@ import type { PlasmoMessaging } from "@plasmohq/messaging";
 
 // const storage = new Storage()  ;
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
-  const tabs = await chrome.tabs.query({currentWindow: true});
-    
+  const tabs = await chrome.tabs.query({});
+  
     if(req.body.voiceActivated) {
       tabs.forEach(async (tab) => {
         chrome.tabs.sendMessage(tab.id, { action: "showButton" });
+        chrome.tts.speak('ji');
         console.log("hi");
-        chrome.tts.speak('Ha bolo');
       })
     } else {
       tabs.forEach(tab => {
