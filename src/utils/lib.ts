@@ -287,7 +287,7 @@ export const readScreen = async (command) => {
               console.log(await chrome.runtime.sendMessage({type: 'restartListening'}));
             // });
           }
-        }
+        }, voiceName: "Samantha"
       });
       
       // console.log("ye dekh bkl", analysis.summary);

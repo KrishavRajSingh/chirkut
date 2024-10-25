@@ -12,7 +12,6 @@ export const PromptTemplate = (user_command: string) => {
     - newTab(): Opens a new tab
     - openWebsite(url: string): Opens the specified website URL in a new tab
     - readScreen(message: String): Provides an AI-assisted summary and analysis of the current page
-    - readSection(sectionId: string): Provides an AI-assisted summary of a specific section
     - clickElement(elementDescription: string): Attempts to click an element based on the description, using AI assistance for interpretation
     - controlMedia(message: "play" | "pause"): Search for video element in webpage and plays it or pause it based on user message.
 
@@ -30,11 +29,6 @@ export const PromptTemplate = (user_command: string) => {
     - "what's on this page" -> {"function": "readScreen", "parameters" :{"message": "what's on this page?"}}
     - "give me an overview" -> {"function": "readScreen": "parameters" :{"message": "give me an overview"}}
     - "summarize this website" -> {"function": "readScreen": "parameters" :{"message": "summarize this website"}}
-
-    # Read Section Command Examples
-    - "tell me about the first section" -> {"function": "readSection", "parameters": {"sectionId": "section1"}}
-    - "what's in the introduction" -> {"function": "readSection", "parameters": {"sectionId": "intro"}}
-    - "read the conclusion" -> {"function": "readSection", "parameters": {"sectionId": "conclusion"}}
 
     # Click Element Command Examples
     - "click tumse mil ke" -> {"function" : "clickElement", "parameters": {"elementDescription": "tumse mil ke"}}
@@ -92,7 +86,8 @@ RESPONSE FORMAT:
 1. Always start with: "Based on the [website type] page you're viewing..."
 2. Provide direct, concise answers
 3. Prevent any kind of formatting
-4. Include relevant metrics (views, dates, prices) when available
+4. Include only main body text or titles
+5. Include relevant metrics (views, dates, prices) when asked by user
 
 EXAMPLE INPUT:
 {
@@ -141,4 +136,5 @@ Remember to:
 - Don't make assumptions about content not visible
 - Adapt response format based on website type
 - Prioritize information based on user's specific query
-- Maintain consistent formatting across responses`;
+- Maintain consistent formatting across responses
+- Provide clear and concise answers`;
