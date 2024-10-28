@@ -10,8 +10,8 @@ export function Main({ name = "Extension" }) {
         flexDirection: "column",
         padding: 16
       }}>
-      <h1>
-        Welcome to your <a href="https://sites.google.co/images?q=abcd/">Plasmo</a> {name}!
+      <h1 className="bg-red-600">
+        Welcome to youur <a href="https://sites.google.co/images?q=abcd/">Plasmo</a> {name}!
       </h1>
       <input onChange={(e) => setData(e.target.value)} value={data} />
 
