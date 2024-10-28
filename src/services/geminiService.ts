@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { GEMINI_API_KEY } from '../config';
 
 const genAi = new GoogleGenerativeAI(process.env.PLASMO_PUBLIC_GEMINI_API);
 
@@ -29,14 +28,78 @@ Answer the above question following the guidelines provided. Remember to be conc
 `;
 }
 
+const functionPromptTemplate = (user_command: string) => {
+   return `
+   # System Context
+    You are a voice command interpreter. Your role is to match user voice commands to predefined functions. You must respond ONLY with a JSON object containing the function name and any parameters. Never include explanations or additional text.
+
+    # Available Functions
+    - nextTab(): Switches to the next browser tab
+    - previousTab(): Switches to the previous browser tab
+    - scrollUp(pixels?: number): Scrolls the page up, optionally by specified pixels. Default pixel is window.innerHeight
+    - scrollDown(pixels?: number): Scrolls the page down, optionally by specified pixels. Default pixel is window.innerHeight
+    - closeTab(): Closes the current tab
+    - newTab(): Opens a new tab
+
+    # Scroll Command Examples
+    - "scroll down" -> {"function": "scrollDown"}
+    - "scroll up" -> {"function": "scrollUp"}
+    - "scroll down 100 pixels" -> {"function": "scrollDown", "parameters": {"pixels": 100}}
+    - "scroll up a bit" -> {"function": "scrollUp"}
+    - "go to bottom of page" -> {"function": "scrollDown", "parameters": {"fullPage": true}}
+    - "scroll to top" -> {"function": "scrollUp", "parameters": {"fullPage": true}}
+    - "go to the end of the page" -> {"function": "scrollDown", "parameters": {"fullPage": true}}
+    - "back to top" -> {"function": "scrollUp", "parameters": {"fullPage": true}}
+
+    # Response Format
+    {
+        "function": "functionName",
+        "parameters": {
+            "paramName": "paramValue"
+        }
+    }
+
+    # Input
+    ${user_command}
+
+    # Rules
+    1. If the command doesn't match any function exactly, choose the closest matching function
+    2. If no function matches at all, return {"function": "unknown"}
+    3. For scroll commands without specific pixels, omit the parameters object
+    4. Numbers mentioned in the command should be converted to parameters
+    5. Always return valid JSON`
+};
+
+function parseGeminiResponse(response) {
+    // Regular expression to match JSON content within triple backticks
+    const jsonRegex = /```json\s*(\{[\s\S]*?(```|[^`])*\})\s*```/;
+  
+    const match = response.match(jsonRegex);
+  
+    if (match && match[1]) {
+      try {
+        // Parse the extracted JSON string
+        return JSON.parse(match[1]);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return null;
+      }
+    } else {
+      console.error("No valid JSON found in the response");
+      return null;
+    }
+  }
+
 export async function askGemini(prompt: string) {
     try {
-        const result = await model.generateContent(promptTemplate(prompt));
-        console.log(result.response.text(), 'service');
+        // console.log(prompt, "serving");
         
-        return result.response.text();
+        const result = await model.generateContent(prompt);
+        console.log(result.response.text(), 'service');
+        const response = result.response.text();
+        return response.includes("`")?parseGeminiResponse(response):response;
     } catch (error) {
         console.error('Error calling Gemini API:', error);
-        throw error; // or handle it as appropriate for your application
+        throw error;
     }
 }

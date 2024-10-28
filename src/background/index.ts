@@ -1,4 +1,6 @@
 import { askGemini } from "~services/geminiService";
+import { Storage } from "@plasmohq/storage"
+const storage = new Storage();
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "switchToNextTab") {
@@ -32,3 +34,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
     }
   });
+  
+  let id;
+chrome.runtime.onInstalled.addListener(async () => {
+  console.log('installed');
+  const tab = await chrome.tabs.create({ url: "tabs/voice-listener.html", pinned: true });
+  id = tab.id;
+  await storage.set("listenerTabId", tab.id);
+});
+
+chrome.tabs.onRemoved.addListener(async (tabId) => {
+    const listenerTabId = id;
+    console.log(tabId, listenerTabId, "backIndex");
+    
+    if (tabId === Number(listenerTabId)) {
+      const newTab = await chrome.tabs.create({ url: "tabs/voice-listener.html", pinned: true })
+      await storage.set("listenerTabId", newTab.id)
+    }
+  })
