@@ -70,16 +70,34 @@ const functionPromptTemplate = (user_command: string) => {
     5. Always return valid JSON`
 };
 
+function parseGeminiResponse(response) {
+    // Regular expression to match JSON content within triple backticks
+    const jsonRegex = /```json\s*(\{[\s\S]*?(```|[^`])*\})\s*```/;
+  
+    const match = response.match(jsonRegex);
+  
+    if (match && match[1]) {
+      try {
+        // Parse the extracted JSON string
+        return JSON.parse(match[1]);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+        return null;
+      }
+    } else {
+      console.error("No valid JSON found in the response");
+      return null;
+    }
+  }
 
-
-export async function askGemini(prompt: string): Promise<string> {
+export async function askGemini(prompt: string) {
     try {
         // console.log(prompt, "serving");
         
         const result = await model.generateContent(prompt);
         console.log(result.response.text(), 'service');
-        
-        return result.response.text();
+        const response = result.response.text();
+        return response.includes("`")?parseGeminiResponse(response):response;
     } catch (error) {
         console.error('Error calling Gemini API:', error);
         throw error;

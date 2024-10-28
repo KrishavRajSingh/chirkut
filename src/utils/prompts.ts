@@ -25,6 +25,13 @@ export const PromptTemplate = (user_command: string) => {
     - "go to the end of the page" -> {"function": "scrollDown", "parameters": {"fullPage": true}}
     - "back to top" -> {"function": "scrollUp", "parameters": {"fullPage": true}}
     
+     # Website Command Examples
+    - "search youtube" -> {"function": "openWebsite", "parameters": {"url": "https://www.youtube.com"}}
+    - "search maps" -> {"function": "openWebsite", "parameters": {"url": "https://www.google.com/maps"}}
+    - "search facebook" -> {"function": "openWebsite", "parameters": {"url": "https://www.facebook.com"}}
+    - "open twitter" -> {"function": "openWebsite", "parameters": {"url": "https://twitter.com"}}
+    - "search the linkedin of Rajat Jain from Genwise" -> {"function": "openWebsite", "parameters": {"url": "https://www.linkedin.com/search/results/all/?keywords=Rajat+Jain+Genwise"}}
+
     # Read Screen Command Examples
     - "what's on this page" -> {"function": "readScreen", "parameters" :{"message": "what's on this page?"}}
     - "give me an overview" -> {"function": "readScreen": "parameters" :{"message": "give me an overview"}}
@@ -32,9 +39,10 @@ export const PromptTemplate = (user_command: string) => {
 
     # Click Element Command Examples
     - "click tumse mil ke" -> {"function" : "clickElement", "parameters": {"elementDescription": "tumse mil ke"}}
-    - "click the search button" -> {"function": "clickElement", "parameters": {"elementDescription": "search button"}}
-    - "press the submit button" -> {"function": "clickElement", "parameters": {"elementDescription": "submit button"}}
-    - "select the first link" -> {"function": "clickElement", "parameters": {"elementDescription": "first link"}}
+    - "click search" -> {"function": "clickElement", "parameters": {"elementDescription": "search"}}
+    - "press play" -> {"function": "clickElement", "parameters": {"elementDescription": "play"}}
+    - "click the input box" -> {"function": "clickElement", "parameters": {"elementDescription": "input"}}
+    - "click profile picture" -> {"function": "clickElement", "parameters": {"elementDescription": "profile"}}
 
     # Input
     ${user_command}
