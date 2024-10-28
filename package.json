@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@plasmohq/messaging": "^0.6.2",
     "@types/ol": "^7.0.0",
     "dotenv": "^16.4.5",
     "framer-motion": "^11.11.10",
@@ -52,11 +53,13 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "*://*/*"
     ],
     "permissions": [
       "tabs",
-      "activeTab"
+      "activeTab",
+      "scripting",
+      "tts"
     ]
   },
   "packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4"

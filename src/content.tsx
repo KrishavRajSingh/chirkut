@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
 import MapComponent from "~components/MapComponent";
-import { askGemini } from "~services/geminiService";
-import dotenv from 'dotenv';
-dotenv.config();
+
 // Define interfaces for the Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -134,7 +132,7 @@ const CustomButton = () => {
     setTranscript(currentTranscript);
     console.log(currentTranscript, 'hi');
     
-    chrome.runtime.sendMessage({ action: "updateTranscript", transcript: currentTranscript });
+    // chrome.runtime.sendMessage({ action: "updateTranscript", transcript: currentTranscript });
     // chrome.runtime.onMessage()
     // Clear any existing timeout
     if (timeoutRef.current) {
@@ -179,6 +177,34 @@ const CustomButton = () => {
     };
   }, [listening, handleSpeechResult]);
 
+  let popup: HTMLDivElement | null = null;
+  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+    console.log("reques in content", request.action);
+    
+    if (request.action === "showButton") {
+      if (!popup) {
+        // button = createButton()
+        popup = document.createElement("div")
+        popup.textContent = "Voice Activated"
+        popup.style.position = "fixed"
+        popup.style.top = "10px"
+        popup.style.right = "10px"
+        popup.style.zIndex = "9999"
+        popup.style.padding = "10px"
+        popup.style.backgroundColor = "#4CAF50"
+        popup.style.color = "white"
+        popup.style.border = "none"
+        popup.style.borderRadius = "5px"
+        popup.style.cursor = "pointer"
+        document.body.appendChild(popup);
+      }
+      popup.style.display = "block"
+    } else if (request.action === "hideButton") {
+      if(popup)
+        popup.style.display = "none";
+    }
+  });
+  
   return (
     <div style={{color: "yellow", position: "fixed", bottom: "1rem", right: "1rem"}}>
       {showMap && 
@@ -208,5 +234,6 @@ const CustomButton = () => {
     </div>
   )
 }
+
 
 export default CustomButton;
