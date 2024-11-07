@@ -5,14 +5,18 @@ type ScrollDirection = 'up' | 'down';
 type Switchdirection = 'next' | 'previous';
 
 const switchTab = (direction: Switchdirection) => {
-    chrome.tabs.query({currentWindow: true}, (tabs) => {
-        if(tabs.length <= 1) return;
-
-        const activeTabIndex = tabs.findIndex(tab => tab.active);
-        const nextTabIndex = direction === 'next' ? (activeTabIndex + 1) % tabs.length : (activeTabIndex - 1 + tabs.length) % tabs.length;
-
-        chrome.tabs.update(tabs[nextTabIndex].id!, {active: true});
-    })
+    try{
+      chrome.tabs.query({currentWindow: true}, (tabs) => {
+          if(tabs.length <= 1) return;
+  
+          const activeTabIndex = tabs.findIndex(tab => tab.active);
+          const nextTabIndex = direction === 'next' ? (activeTabIndex + 1) % tabs.length : (activeTabIndex - 1 + tabs.length) % tabs.length;
+  
+          chrome.tabs.update(tabs[nextTabIndex].id!, {active: true});
+      })
+    } catch(error){
+      console.error("Error switching tab", error);
+    }
 };
 
 export const nextTab = () => switchTab('next');
