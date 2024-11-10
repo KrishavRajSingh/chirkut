@@ -49,7 +49,7 @@ const features = [
 
 export function Main({ name }) {
   return (
-    <div>
+    <div id="listener-tab">
       <div className="h-screen">
         <header className="max-w-7xl mx-auto px-4 py-8 flex justify-between items-center relative z-10">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-fuchsia-400 bg-clip-text text-transparent ">Chirkut</h1>
@@ -91,10 +91,10 @@ export function Main({ name }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           {features.map((feature, index) => (
             <div key={index} className="group relative">
-              {/* Gradient border effect */}
+              {/* gradient border */}
               <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-400 to-fuchsia-400 rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-300"></div>
               
-              {/* Card content */}
+              {/* card */}
               <div className="relative bg-gray-900 p-6 rounded-lg h-full transform transition duration-300 group-hover:-translate-y-1">
                 <div className="flex items-center mb-4">
                   <div className="p-2 rounded-lg bg-gradient-to-r from-cyan-400/10 to-fuchsia-400/10">

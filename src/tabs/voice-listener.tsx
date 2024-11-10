@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { sendToBackground } from "@plasmohq/messaging";
 import { closeTab, previousTab, scrollDown, scrollUp, nextTab } from "~utils/lib";
-import next from "next";
-import { set } from "ol/transform";
-import { sendResponse } from "next/dist/server/image-optimizer";
+import "../style.css";
+import { MovingGradient } from "~components/MovingGradient";
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -50,7 +49,7 @@ const VoiceListener = () => {
   // };
 
   const handleRecognition = async (reckognize: boolean): Promise<void> => {
-    const res = await sendToBackground({name: "activateVoiceCommands", body:{  voiceActivated: reckognize } });
+    const res = await sendToBackground({name: "activateVoiceCommands", body: { voiceActivated: reckognize } });
     console.log("res", reckognize);
     
     if(res.success)
@@ -154,17 +153,22 @@ const VoiceListener = () => {
   }, [handleSpeechResult])
 
   return (
-    <div style={{
+    <div
+      id="listener-tab"
+    style={{
       fontFamily: 'Arial, sans-serif',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       height: '100vh',
-      margin: 0,
-      backgroundColor: '#f0f0f0'
+      margin: 0
     }}>
-      <div style={{fontSize: '24px', textAlign: 'center'}}>
-        {status}
+      <MovingGradient/>
+      <div className="">
+        <div className="text-2xl bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">This tab is used for listening your voice</div>
+        <div className="text-white" style={{fontSize: '24px', textAlign: 'center'}}>
+          {status}
+        </div>
       </div>
     </div>
   )

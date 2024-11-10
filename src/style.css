@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-body{
-  background-color: #050f22;
+#listener-tab{
+  background-color: #0b031f;
 }
 
 .leaflet-container{

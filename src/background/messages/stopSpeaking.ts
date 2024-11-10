@@ -1,5 +1,6 @@
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 import { nextTab } from "~utils/lib";
+import { stopSpeaking } from "~utils/voiceControlLib";
 
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     // chrome.tabs.query({ currentWindow: true }, (tabs) => {
@@ -12,7 +13,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
     //     chrome.tabs.update(tabs[nextTabIndex].id!, { active: true });
     // });
     // res.send({ success: true });
-    nextTab();
+    stopSpeaking();
 }
 
 export default handler;

@@ -1,5 +1,6 @@
 import { askGemini } from "~services/geminiService";
 import { prompt } from "./prompts";
+import { speak } from "./voiceControlLib";
 
 type ScrollDirection = 'up' | 'down';
 type Switchdirection = 'next' | 'previous';
@@ -65,99 +66,11 @@ type GeminiResponse = {
   parameters?: { [key: string]: any };
 };
 
-// Function to send content to Gemini for analysis
 async function analyzeContent(content, structure, command) {
-
-// const prompt2 = `
-// You are an AI assistant helping a blind user understand the content of a webpage. You will receive structured data extracted from the webpage, including the URL, main content and user command. Your task is to analyze this data and provide the content information based on user's command. Always prioritize the user's full command first carefully understand the user's needs and pay attention what the user is asking for. If the user does not provide a clear command, you should provide the most relevant content information based on the url in a concise manner.
-
-// Extracte data:
-// {
-//   "url": ${content.url},
-//   "mainText": ${content.content},
-//   "userCommand": ${command}
-// }
-
-// Based on the URL and content, determine the type of website (e.g., YouTube, Google Search, Wikipedia, news article, etc.) and provide content present in the website. Sometimes the user can ask for a specific content he wants to find, like 'what are the music videos on this pages' or 'which videos has most views' or 'Price of an item that the user searched for etc., in these cases analyze the whole page and then answer to the point. Here are some guidelines if the user has not specified what to return:
-
-// 1. For YouTube (url contains "youtube.com"):
-//   - Focus only on video titles and channel names, if the user specifies other things like views and time in the userCommand then return that.
-//   - If it's a specific video page, describe the video title, channel and view count
-//   - If the title is long try to shorten it.
-
-// 2. For Google Search (url contains "google.com" and "/search"):
-//   - Focusing on the titles until and unless user specifies what it wants.
-//   - Mention any featured snippets or special search features (e.g., "People also ask").
-//   - If possible, identify the search query from the URL and mention it.
-
-// 3. For Wikipedia (url contains "wikipedia.org"):
-//   - Provide a brief overview of the main topic.
-//   - Mention key sections or headings.
-//   - If it's the main page, describe any featured articles or current events.
-
-// 4. For news articles:
-//   - Summarize the headline and main points of the article.
-//   - Mention the source and publication date if available.
-//   - If it's a news homepage, mention top headlines or sections.
-
-// 5. For social media sites (e.g., Twitter, Facebook, LinkedIn):
-//   - Describe the type of page (personal profile, company page, news feed, etc.).
-//   - Mention any trending topics or important updates.
-
-// 6. For e-commerce sites (e.g., Amazon, eBay):
-//   - If it's a product page, describe the product name, price, and key features.
-//   - If it's a category page, mention the category and top products.
-
-// 7. For other websites:
-//   - Provide a general overview of the page's purpose and main content.
-//   - Highlight any important headings or sections.
-
-// Always prioritize the most relevant information for the user's understanding of the page. Keep your response concise and focused on the key elements that define the website type. Keep the response concise and don't use any formatting.
-
-// EXAMPLE INPUT:
-// {
-//   "url": "https://www.youtube.com/",
-//   "mainText": ["How to code like a pro, 22M, 3 years ago", "Summer Mix 2024 (1M views), 3 days ago", "Tujhe dekha toh ye jana sanam Song, 100k, 6 mkonths ago"...]",
-//   "userCommand": "what music videos are present on my screen?"
-// }
-
-// EXAMPLE OUTPUT:
-// Based on the YouTube page you're viewing, here are the trending music videos:
-// • Summer Mix 2024
-// • Tujhe dekha toh ye jana sanam Song
-// [rest of the response...]
-
-// {
-//   "url": "https://www.youtube.com/",
-//   "mainText": ["How to code like a pro, 22M, 3 years ago", "Summer Mix 2024 (1M views), 3 months ago", "Tujhe dekha toh ye jana sanam Song, 100k, 6 days ago"...]",
-//   "userCommand": "recently uploaded videos on my screen?"
-// }
-
-// EXAMPLE OUTPUT:
-// Based on the YouTube page you're viewing, here are the trending music videos:
-// • Tujhe dekha toh ye jana sanam Song, 6 days ago
-// • Summer Mix 2024, 3 months ago
-// [rest of the response...]
-
-// {
-//   "url": "https://www.youtube.com/",
-//   "mainText": ["How to code like a pro, 22M, 3 years ago", "Summer Mix 2024 (1M views), 3 days ago", "Tujhe dekha toh ye jana sanam Song, 100k, 6 months ago"...]",
-//   "userCommand": "most viewed videos on my screen?"
-// }
-
-// EXAMPLE OUTPUT:
-// Based on the YouTube page you're viewing, here are the trending music videos:
-// • How to code like a pro (22M views)
-// • Summer Mix 2024 (1M views)
-// [rest of the response...]
-
-
-// Remember, the user is blind, so focus on the content rather than visual elements. Use the URL to provide context, but rely primarily on the extracted content for your summary. You must return what the user is asking for.
-// `;
-
   const response = await askGemini(prompt(content, command));
   return response;
 }
+
 export const readScreen = async (command) => {
     try{
       const [activeTab] = await chrome.tabs.query({ active: true });
@@ -194,35 +107,16 @@ export const readScreen = async (command) => {
               }));
             }
 
-            // function extractLinks() {
-            //   const headings: HTMLElement[] = Array.from(document.querySelectorAll('a'));
-            //   return headings.map(heading => ({
-            //       level: parseInt(heading.tagName.charAt(1)),
-            //       text: heading.innerText.trim(),
-            //       id: heading.id || null
-            //   }));
-            // }
-
-
             const content = extractMainContent();
             const structure = extractStructuredContent();
-            // const links = extractLinks();
             console.log("hua", structure);
             return {content, structure};
-            // const analysis = await analyzeContent(content, structure);
-            // console.log("gemini swara", analysis)
-            // chrome.tts.speak(analysis.summary);
-        
-            // return {
-            //     pageTitle: content.title,
-            //     pageUrl: content.url,
-            //     ...analysis
-            // };
           }
       });
       console.log("yayayya", screenData.result.content, screenData.result.structure);
       const analysis = await analyzeContent(screenData.result.content, screenData.result.structure, command);
       // chrome.tts.speak(analysis, {rate: 0.8});
+      chrome.tabs.sendMessage(activeTab.id, {action: "showModal", message: analysis});
       chrome.tts.speak(analysis, {
         onEvent: async (event) => {
           // console.log('Event:', event);
@@ -349,6 +243,9 @@ export const clickElement = async (message) => {
 
     // Scoring function to find best match
     const findBestMatch = (elements, command, url) => {
+      if(command.includes("click")){
+        command = command.replace("click", "").trim();
+      }
       const searchTerms = command.toLowerCase()
         .replace(/click|press|select|the|on|at/g, '')
         .trim()
@@ -463,33 +360,33 @@ export const controlMedia = async (message): Promise<void> => {
   try{
     const activeTabId = await getActiveTabId();
     if(!activeTabId) return;
-    console.log('hi1');
+    // console.log('hi1');
     
     const [videoPaused] = await chrome.scripting.executeScript({
       target: {tabId: activeTabId},
       func: async(message)=>{
-        console.log('hi2', message);
+        // console.log('hi2', message);
         const video =  document.querySelector("video");
         console.log(video);
         if(message==='pause')
-          await video.pause();
+          video.pause();
         else{
-          video.muted = true;
-          await video.play();
+          // video.muted = true;
+          video.play();
         }
         console.log("video ha pause", video.paused);
-        if(video.paused === true || video.paused === null){
+        if(message == 'play' && video.paused === true || video.paused === null){
           video.muted = true;
           video.play();
         }
-        return {playing: !video.paused};
+        return {playing: !video.muted};
       },
       args: [message]
     })
     console.log("videoPaused", videoPaused);
     
     if(!videoPaused.result.playing)
-      chrome.tts.speak("Press Space Bar to play the video");
+      speak("Video muted due to autoplay policy");
   } catch(err){
     console.error(err);
   }
@@ -517,7 +414,17 @@ export const executeCommand = async (response: GeminiResponse): Promise<void> =>
         break;
       case 'openWebsite':
         if (response.parameters?.url) {
-            chrome.tabs.create({ url: response.parameters.url });
+            chrome.tabs.create({ url: response.parameters.url }).then((tab) => {
+              // chrome.tts.speak("Opened website")
+              const websiteLoaded = (tabId, tabInfo) => {
+                if(tabId === tab.id && tabInfo.status === "complete"){
+                  speak("Website loaded");
+                  chrome.tabs.onUpdated.removeListener(websiteLoaded);
+                }
+                
+              }
+              chrome.tabs.onUpdated.addListener(websiteLoaded);
+            });
         }
         break;
       case 'readScreen':
@@ -534,6 +441,7 @@ export const executeCommand = async (response: GeminiResponse): Promise<void> =>
       default:
         console.warn(`Unknown function: ${response.function}`);
         notifyUser = false;
+        speak("Unknown command");
     }
     // chrome.tts.speak("done");
   } catch (error) {

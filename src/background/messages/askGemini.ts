@@ -20,8 +20,7 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
         res.send({ success: true, data: message });
 
     } catch (error) {
-        console.error("Error in handling gemini command");
-        throw error;
+        console.error("Error in handling gemini command", error);
     }
 }
 

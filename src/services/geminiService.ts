@@ -97,7 +97,7 @@ export async function askGemini(prompt: string) {
         const result = await model.generateContent(prompt);
         console.log(result.response.text(), 'service');
         const response = result.response.text();
-        return response.includes("`")?parseGeminiResponse(response):response;
+        return response.startsWith("`")?parseGeminiResponse(response):response;
     } catch (error) {
         console.error('Error calling Gemini API:', error);
         throw error;
