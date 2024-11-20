@@ -14,17 +14,16 @@ const Modal = () => {
     useEffect(() => {
         const showModalListener = async(request, sender, sendResponse) => {
           if(request.action === "showModal"){
-            setModal(request.message)
+            setModal(request.message);
           }
-          sendResponse({message: "Success"})
+          sendResponse({success: true});
         };
-        chrome.runtime.onMessage.addListener(showModalListener)
+        chrome.runtime.onMessage.addListener(showModalListener);
         return () => chrome.runtime.onMessage.removeListener(showModalListener);
     }, [])
 
     return (
       (modal && <div className="fixed inset-3 flex justify-center items-center p-2">
-        {/* <div className="bg-gradient-to-r from-cyan-400 bg-fuchsia-400"></div> */}
         <div className="relative group max-w-xl ">
           <div className="absolute -inset-1.5 bg-gradient-to-r from-cyan-400 to-fuchsia-400 rounded-lg blur opacity-30 group-hover:opacity-80  duration-300"></div>
           <div className="duration-300 group-hover:-translate-y-1 relative rounded-lg">

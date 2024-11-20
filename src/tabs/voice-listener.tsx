@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { sendToBackground } from "@plasmohq/messaging";
 import { closeTab, previousTab, scrollDown, scrollUp, nextTab } from "~utils/lib";
 import "../style.css";
 import { MovingGradient } from "~components/MovingGradient";
+import { useStorage } from "@plasmohq/storage/hook";
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -37,20 +38,15 @@ const VoiceListener = () => {
   const [status, setStatus] = useState("Initializing voice recognition...")
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // const startRecognizing = async(): Promise<void> => {
-  //   if(recognitionRef.current){
-  //     const res =  await sendToBackground({ name: "activateVoiceCommands", body: {voiceActivated: true} });
-  //     if(res.success)
-  //       setListening(true);
-  //     console.log("chirkut enabled", res);
-  //   }
-  // };
+  const [transcript, setTranscript] = useStorage("transcript", "");
 
   const handleRecognition = async (reckognize: boolean): Promise<void> => {
-    const res = await sendToBackground({name: "activateVoiceCommands", body: { voiceActivated: reckognize } });
-    console.log("res", reckognize);
+    const res = await sendToBackground({
+      name: "activateVoiceCommands",
+      body: { 
+        voiceActivated: reckognize 
+      } 
+    });
     
     if(res.success)
       setListening(reckognize);
@@ -75,13 +71,6 @@ const VoiceListener = () => {
     if(recognitionRef.current) {
       await handleRecognition(false);
       recognitionRef.current.stop();
-      console.log("aah");
-      
-      // const res = await sendToBackground({ name: "activateVoiceCommands", body: { voiceActivates: false } });
-      // console.log(res.success, 'yay');
-      // if(res.success)
-      //   setListening(false);
-
     }
   };
 
@@ -89,16 +78,7 @@ const VoiceListener = () => {
     const currentTranscript = event.results[event.results.length - 1][0].transcript;
     console.log(currentTranscript);
     if(currentTranscript.includes('chirkut')) {
-      console.log(103);
       await handleRecognition(true);
-      // const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      // chrome.tabs.sendMessage(activeTab.id!, { action: "speak", text: "Hello"});
-      // chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      //   chrome.tabs.sendMessage(tabs[0].id, { action: "speak", text: "helllloo" });
-      // });
-      // let utterance = new SpeechSynthesisUtterance("Yes, I am here. How can I help you?");
-      // speechSynthesis.speak(utterance);
-      
     }
     setStatus(currentTranscript);
     // if(timeoutRef.current) {
@@ -107,10 +87,15 @@ const VoiceListener = () => {
 
     // timeoutRef.current = setTimeout(() => {
     //   console.log('processTranscript');
-      if(listening)
+    if(listening){
+        setTranscript(currentTranscript);
+        setTimeout(() => setTranscript(null), 12000)
+
         processTranscript(currentTranscript);
+      }
     // }, 2000);
   };
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "restartListening"){
       // if(recognitionRef.current){
@@ -119,7 +104,7 @@ const VoiceListener = () => {
         // if(request.listening)
         // recognitionRef.current.stop();
         console.log("yay");
-        sendResponse("ok")
+        sendResponse({success: true})
         // else
         recognitionRef.current.stop();
       // }
@@ -137,18 +122,15 @@ const VoiceListener = () => {
         console.log('Recognition ended');
         
         recognitionRef.current.start();
-        
-        // setListening(false);
-        // console.log(138);
-        
-        // sendToBackground({ name: "activateVoiceCommands", body: {voiceActivated: false} });
       }
+
       recognitionRef.current.start();
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.stop()
+        recognitionRef.current.stop();
       }
+      setTranscript(null);
     }
   }, [handleSpeechResult])
 

@@ -360,3 +360,42 @@ Remember to:
 - Format information logically based on content type
 - Consider the website context when determining relevance
 - Do not use any markdown formatting`;
+
+export const placePrompt = (inputText) => `
+You are a precise location extractor. Your task is to analyze the provided text and extract all geographical locations mentioned, including:
+- Countries
+- Cities
+- States/Provinces
+- Landmarks
+- Mountains
+- Rivers
+- Historical sites
+- National parks
+- Neighborhoods
+- Regions
+
+Rules:
+1. Return ONLY an array of locations in valid JSON format
+2. Include the full official name of the place (e.g., "New York City" instead of just "New York")
+3. Do not include generic location terms (e.g., "downtown", "coast", "border")
+4. Do not include fictional places
+5. Do not include organization names that contain place names
+6. Remove duplicates
+7. If no places are found, return an empty array
+8. Do not include any explanations or additional text
+
+Example Input:
+"I visited the Empire State Building last summer. After New York, we traveled to Los Angeles and then drove through the Mojave Desert to Las Vegas. The Grand Canyon was breathtaking."
+
+Expected Output:
+[
+  "Empire State Building",
+  "New York City",
+  "Los Angeles",
+  "Mojave Desert",
+  "Las Vegas",
+  "Grand Canyon"
+]
+
+Now analyze the following text and extract all locations:
+${inputText}`

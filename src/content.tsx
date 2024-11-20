@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react"
-import MapPopup from "./components/MapPopup";
+// import MapPopup from "./components/MapPopup";
 import "leaflet/dist/leaflet.css";
 import MapComponent from "~components/MapComponent";
 import cssText from "data-text:style.css"
@@ -60,7 +60,6 @@ const CustomButton = () => {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [lon, setLon] = useState(0);
   const [lat, setLat] = useState(0);
-  const [modal, setModal] = useState(null);
   
   function updateMap(location: string){
     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`)
@@ -123,7 +122,6 @@ const CustomButton = () => {
           let utterance = new SpeechSynthesisUtterance(response);
           speechSynthesis.speak(utterance);
 
-          setModal(response);
           // Stop listening once the search action is triggered
           if (recognitionRef.current) {
             recognitionRef.current.stop();
@@ -183,34 +181,6 @@ const CustomButton = () => {
       }
     };
   }, [listening, handleSpeechResult]);
-
-  let popup: HTMLDivElement | null = null;
-  chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    console.log("reques in content", request.action);
-    
-    if (request.action === "showButton") {
-      if (!popup) {
-        // button = createButton()
-        popup = document.createElement("div")
-        popup.textContent = "Voice Activated"
-        popup.style.position = "fixed"
-        popup.style.top = "10px"
-        popup.style.right = "10px"
-        popup.style.zIndex = "9999"
-        popup.style.padding = "10px"
-        popup.style.backgroundColor = "#4CAF50"
-        popup.style.color = "white"
-        popup.style.border = "none"
-        popup.style.borderRadius = "5px"
-        popup.style.cursor = "pointer"
-        document.body.appendChild(popup);
-      }
-      popup.style.display = "block"
-    } else if (request.action === "hideButton") {
-      if(popup)
-        popup.style.display = "none";
-    }
-  });
   
   return (
     <div style={{color: "yellow", position: "fixed", bottom: "1rem", right: "1rem"}}>
@@ -218,20 +188,6 @@ const CustomButton = () => {
       <div style={{display: "flex"}}>
         <MapComponent lon={lon} lat={lat} setShowMap={setShowMap}/>
       </div>}
-      {modal && <div style={{
-      maxWidth: "15rem",
-      position: "fixed",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      backgroundColor: "black",
-      color: "white",
-      padding: "1rem",
-      display: "flex",
-      flexDirection: "column",
-    }}>
-      <button onClick={() => setModal(null)} style={{backgroundColor: "red", width: '2rem', textAlign: "center"}}>X</button>
-      {modal}</div>}
       <p>{transcript}</p>
       <button
         style={{ height: "3rem" }}

@@ -121,8 +121,13 @@ export const readScreen = async (command) => {
         onEvent: async (event) => {
           // console.log('Event:', event);
           if (event.type === 'end') {
-              console.log(await chrome.runtime.sendMessage({type: 'restartListening'}));
-            // });
+              try{
+                const res = await chrome.runtime.sendMessage({type: 'restartListening'});
+                console.log("listening restarted:", res.success);
+                
+              }catch(err){
+                console.error("Error restarting listeing", err);
+              }
           }
         }, voiceName: "Samantha"
       });
@@ -345,7 +350,7 @@ export const clickElement = async (message) => {
       },
       args: [matches]
     });
-
+    speak("Clicked");
   } catch (err) {
     console.error("Error while clicking element", err);
   }
@@ -362,7 +367,7 @@ export const controlMedia = async (message): Promise<void> => {
     if(!activeTabId) return;
     // console.log('hi1');
     
-    const [videoPaused] = await chrome.scripting.executeScript({
+    const [videoInfo] = await chrome.scripting.executeScript({
       target: {tabId: activeTabId},
       func: async(message)=>{
         // console.log('hi2', message);
@@ -379,16 +384,151 @@ export const controlMedia = async (message): Promise<void> => {
           video.muted = true;
           video.play();
         }
-        return {playing: !video.muted};
+        return {muted: video.muted};
       },
       args: [message]
     })
-    console.log("videoPaused", videoPaused);
+    console.log("videoPaused", videoInfo);
     
-    if(!videoPaused.result.playing)
+    if(videoInfo.result.muted)
       speak("Video muted due to autoplay policy");
   } catch(err){
     console.error(err);
+  }
+}
+
+export const getRealTimeData = async(message) => {
+  try{
+    // chrome.tabs.create({active: true, url: encodeURI("https://www.google.com/search?q=" + message)}, 
+    // async (tab) => {
+    //   console.log("tab created", tab);
+
+    //   const onUpdatedListener = async(tabId, changeInfo) => {
+    //     if(tabId === tab.id && changeInfo.status === "complete"){
+
+    //       const [data] = await chrome.scripting.executeScript({
+    //         target: {tabId: tab.id},
+    //         func: async() => {
+    //           // console.log("ht");
+              
+    //           function waitForSelectorWithObserver(selector, timeout = 5000) {
+    //             return new Promise((resolve, reject) => {
+    //               const observer = new MutationObserver((mutationsList, obs) => {
+    //                 const element = document.querySelector(selector);
+    //                 if (element) {
+    //                   obs.disconnect(); // Stop observing
+    //                   resolve(element);
+    //                 }
+    //               });
+              
+    //               // Start observing the document
+    //               observer.observe(document.body, { childList: true, subtree: true });
+              
+    //               // Set a timeout to reject if the element isn't found in time
+    //               setTimeout(() => {
+    //                 observer.disconnect();
+    //                 reject(new Error("Timeout: Selector not found"));
+    //               }, timeout);
+    //             });
+    //           }
+              
+    //           // Usage
+    //           // waitForSelectorWithObserver()
+    //           //   .then((summaryContainer) => {
+    //           //     const data = (summaryContainer as HTMLElement).innerText;
+    //           //     console.log("Data fetched:", data);
+    //           //     return data;
+    //           //   })
+    //           //   .catch((error) => {
+    //           //     console.error(error);
+    //           //   });
+    //           const summaryContainer = await waitForSelectorWithObserver('[data-subtree="mfc"]');
+    //           const data = (summaryContainer as HTMLElement)?.innerText;
+    //           console.log(data);
+              
+    //           return data;
+              
+    //         }
+    //       })
+    //       console.log(data.result);
+          
+    //       chrome.tabs.onUpdated.removeListener(onUpdatedListener);
+    //     }
+    //   }
+
+    //   chrome.tabs.onUpdated.addListener(onUpdatedListener);
+      
+    //   // console.log(data);
+    // });
+    // const id = await getActiveTabId();
+    // if(!id) return;
+
+    // const [data] = await chrome.scripting.executeScript({
+    //   target: {tabId: id},
+    //   func: ()  => {
+    //     const summaryContainer = document.querySelector('h3');
+    //     const data = (summaryContainer as HTMLElement)?.innerText;
+    //     console.log(data);
+    //     return data;
+    //   }
+    // });
+    // console.log(data);
+    
+    chrome.tabs.create({ active: true, url: encodeURI("https://www.google.com/search?q=" + message) }, async (tab) => {
+      console.log("Tab created:", tab);
+    
+      const onUpdatedListener = async (tabId, changeInfo) => {
+        if (tabId === tab.id && changeInfo.status === "complete") {
+          const [data] = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => {
+              // Function to wait for any selectors that appear
+              function waitForOptionalSelectors(selectors, timeout = 5000) {
+                return new Promise((resolve) => {
+                  const results = {};
+                  const observer = new MutationObserver(() => {
+                    selectors.forEach((selector) => {
+                      const element = document.querySelector(selector);
+                      if (element && !results[selector]) {
+                        results[selector] = element.innerText;
+                      }
+                    });
+    
+                    // If all selectors have been found, stop observing
+                    if (Object.keys(results).length === selectors.length) {
+                      observer.disconnect();
+                      resolve(results);
+                    }
+                  });
+    
+                  observer.observe(document.body, { childList: true, subtree: true });
+    
+                  // Resolve with whatever data is found when the timeout expires
+                  setTimeout(() => {
+                    observer.disconnect();
+                    resolve(results); // Return collected data even if some selectors are missing
+                  }, timeout);
+                });
+              }
+              // console.log("ji", document.querySelector(".ULSxyf")?.innerText)
+              // Wait for the selectors
+              return waitForOptionalSelectors(['[data-subtree="mfc"]', '.ULSxyf']);
+            },
+          });
+    
+          // Log the fetched data
+          console.log("Data fetched:", data.result); // `data.result` contains data for whichever selectors were found
+          chrome.tabs.onUpdated.removeListener(onUpdatedListener);
+        }
+      };
+    
+      chrome.tabs.onUpdated.addListener(onUpdatedListener);
+    });
+    
+    
+    
+  }catch(err){
+    console.error("Error gettin Real Time data: ", err )
   }
 }
 

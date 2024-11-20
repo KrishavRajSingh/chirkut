@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 const genAi = new GoogleGenerativeAI(process.env.PLASMO_PUBLIC_GEMINI_API);
 
 const model = genAi.getGenerativeModel({
-    model: 'gemini-1.5-flash'
+    model: 'gemini-1.5-pro'
 });
 
 const promptTemplate  = (prompt: string) => {

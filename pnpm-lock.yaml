@@ -14,6 +14,9 @@ importers:
       '@plasmohq/messaging':
         specifier: ^0.6.2
         version: 0.6.2(react@18.2.0)
+      '@plasmohq/storage':
+        specifier: 1.12.0
+        version: 1.12.0(react@18.2.0)
       '@types/ol':
         specifier: ^7.0.0
         version: 7.0.0
@@ -39,8 +42,8 @@ importers:
         specifier: ^10.2.1
         version: 10.2.1
       plasmo:
-        specifier: 0.89.3
-        version: 0.89.3(@swc/core@1.7.26(@swc/helpers@0.5.13))(@swc/helpers@0.5.13)(lodash@4.17.21)(postcss@8.4.47)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        specifier: 0.89.4
+        version: 0.89.4(@swc/core@1.7.26(@swc/helpers@0.5.13))(@swc/helpers@0.5.13)(lodash@4.17.21)(postcss@8.4.47)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -57,9 +60,6 @@ importers:
       '@plasmohq/rps':
         specifier: 1.8.7
         version: 1.8.7
-      '@plasmohq/storage':
-        specifier: 1.12.0
-        version: 1.12.0(react@18.2.0)
       '@types/chrome':
         specifier: 0.0.258
         version: 0.0.258
@@ -1080,8 +1080,8 @@ packages:
   '@plasmohq/parcel-config@0.41.1':
     resolution: {integrity: sha512-peNpm+F1tVIZmDx8Mca8b3769cxc2IWS7q0+0Y4BLT1+2kis7X4b46IAYgOXtsDRZCb9pvxQhRhrVHpwGtdVLg==}
 
-  '@plasmohq/parcel-core@0.1.9':
-    resolution: {integrity: sha512-xuWfArWo4O9+RCb8mdvxf+hFH5lldLnufXGFCXnqBMGvL/A/l1NvQjXjVKYoTnPeX+9iZd534rb/7v49BPayCg==}
+  '@plasmohq/parcel-core@0.1.10':
+    resolution: {integrity: sha512-XbJrqlgPNo+uQaukWayfRDZnAvdkYrmcydCOz0wfmuksTjDisyGkL3ZbWeX86QPN65CXFyou11/9h3+U9IsHfA==}
     engines: {parcel: '>= 2.7.0'}
 
   '@plasmohq/parcel-namer-manifest@0.3.12':
@@ -2836,8 +2836,8 @@ packages:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
 
-  plasmo@0.89.3:
-    resolution: {integrity: sha512-rBOv1fbNnhdfsDmI5XAMCvNmPwZsXWdcPU4lLH8I1PqXNDeyXCEJdiCLC+4LvB8V262a2UhHgvPwTW9Au4qAmQ==}
+  plasmo@0.89.4:
+    resolution: {integrity: sha512-vsoMe8ts0tyW27fZxwQLqWR/58NKqRepLFrZMVBH4ceSIyPDryfPpXzVxmBDH43odbiUVFdh8BGAt2ri2vQuGw==}
     hasBin: true
 
   postcss-import@15.1.0:
@@ -4638,7 +4638,7 @@ snapshots:
       - walrus
       - whiskers
 
-  '@plasmohq/parcel-core@0.1.9':
+  '@plasmohq/parcel-core@0.1.10':
     dependencies:
       '@parcel/cache': 2.9.3(@parcel/core@2.9.3)
       '@parcel/core': 2.9.3
@@ -6440,7 +6440,7 @@ snapshots:
 
   pirates@4.0.6: {}
 
-  plasmo@0.89.3(@swc/core@1.7.26(@swc/helpers@0.5.13))(@swc/helpers@0.5.13)(lodash@4.17.21)(postcss@8.4.47)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+  plasmo@0.89.4(@swc/core@1.7.26(@swc/helpers@0.5.13))(@swc/helpers@0.5.13)(lodash@4.17.21)(postcss@8.4.47)(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
     dependencies:
       '@expo/spawn-async': 1.7.2
       '@parcel/core': 2.9.3
@@ -6449,7 +6449,7 @@ snapshots:
       '@parcel/watcher': 2.2.0
       '@plasmohq/init': 0.7.0
       '@plasmohq/parcel-config': 0.41.1(@swc/core@1.7.26(@swc/helpers@0.5.13))(@swc/helpers@0.5.13)(lodash@4.17.21)(postcss@8.4.47)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(typescript@5.2.2)
-      '@plasmohq/parcel-core': 0.1.9
+      '@plasmohq/parcel-core': 0.1.10
       buffer: 6.0.3
       chalk: 5.3.0
       change-case: 5.1.2

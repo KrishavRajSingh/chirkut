@@ -9,7 +9,6 @@ const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
       tabs.forEach(async (tab) => {
         chrome.tabs.sendMessage(tab.id, { action: "showButton" });
         chrome.tts.speak('hmm', {voiceName: "Bells"});
-        console.log("hi");
       })
     } else {
       tabs.forEach(tab => {
