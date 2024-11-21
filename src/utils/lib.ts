@@ -1,6 +1,8 @@
 import { askGemini } from "~services/geminiService";
 import { prompt } from "./prompts";
 import { speak } from "./voiceControlLib";
+import { googleAiOverViewSelector, googleTopSectionSelector } from "./selectors";
+import type { GeminiResponse } from "./types";
 
 type ScrollDirection = 'up' | 'down';
 type Switchdirection = 'next' | 'previous';
@@ -59,13 +61,6 @@ export const closeTab = async(): Promise<void> => {
   }
 }
 
-// Define a more precise type for the response
-type GeminiResponse = {
-  function: 'nextTab' | 'previousTab' | 'scrollUp' | 'scrollDown' | 'closeTab' 
-  | 'openWebsite' | 'readScreen' | 'readSection' | 'clickElement' | 'controlMedia';
-  parameters?: { [key: string]: any };
-};
-
 async function analyzeContent(content, structure, command) {
   const response = await askGemini(prompt(content, command));
   return response;
@@ -109,11 +104,11 @@ export const readScreen = async (command) => {
 
             const content = extractMainContent();
             const structure = extractStructuredContent();
-            console.log("hua", structure);
+            // console.log("hua", structure);
             return {content, structure};
           }
       });
-      console.log("yayayya", screenData.result.content, screenData.result.structure);
+      // console.log("yayayya", screenData.result.content, screenData.result.structure);
       const analysis = await analyzeContent(screenData.result.content, screenData.result.structure, command);
       // chrome.tts.speak(analysis, {rate: 0.8});
       chrome.tabs.sendMessage(activeTab.id, {action: "showModal", message: analysis});
@@ -397,134 +392,56 @@ export const controlMedia = async (message): Promise<void> => {
   }
 }
 
-export const getRealTimeData = async(message) => {
+export const askGoogle = async(message) => {
   try{
-    // chrome.tabs.create({active: true, url: encodeURI("https://www.google.com/search?q=" + message)}, 
-    // async (tab) => {
-    //   console.log("tab created", tab);
-
-    //   const onUpdatedListener = async(tabId, changeInfo) => {
-    //     if(tabId === tab.id && changeInfo.status === "complete"){
-
-    //       const [data] = await chrome.scripting.executeScript({
-    //         target: {tabId: tab.id},
-    //         func: async() => {
-    //           // console.log("ht");
-              
-    //           function waitForSelectorWithObserver(selector, timeout = 5000) {
-    //             return new Promise((resolve, reject) => {
-    //               const observer = new MutationObserver((mutationsList, obs) => {
-    //                 const element = document.querySelector(selector);
-    //                 if (element) {
-    //                   obs.disconnect(); // Stop observing
-    //                   resolve(element);
-    //                 }
-    //               });
-              
-    //               // Start observing the document
-    //               observer.observe(document.body, { childList: true, subtree: true });
-              
-    //               // Set a timeout to reject if the element isn't found in time
-    //               setTimeout(() => {
-    //                 observer.disconnect();
-    //                 reject(new Error("Timeout: Selector not found"));
-    //               }, timeout);
-    //             });
-    //           }
-              
-    //           // Usage
-    //           // waitForSelectorWithObserver()
-    //           //   .then((summaryContainer) => {
-    //           //     const data = (summaryContainer as HTMLElement).innerText;
-    //           //     console.log("Data fetched:", data);
-    //           //     return data;
-    //           //   })
-    //           //   .catch((error) => {
-    //           //     console.error(error);
-    //           //   });
-    //           const summaryContainer = await waitForSelectorWithObserver('[data-subtree="mfc"]');
-    //           const data = (summaryContainer as HTMLElement)?.innerText;
-    //           console.log(data);
-              
-    //           return data;
-              
-    //         }
-    //       })
-    //       console.log(data.result);
-          
-    //       chrome.tabs.onUpdated.removeListener(onUpdatedListener);
-    //     }
-    //   }
-
-    //   chrome.tabs.onUpdated.addListener(onUpdatedListener);
-      
-    //   // console.log(data);
-    // });
-    // const id = await getActiveTabId();
-    // if(!id) return;
-
-    // const [data] = await chrome.scripting.executeScript({
-    //   target: {tabId: id},
-    //   func: ()  => {
-    //     const summaryContainer = document.querySelector('h3');
-    //     const data = (summaryContainer as HTMLElement)?.innerText;
-    //     console.log(data);
-    //     return data;
-    //   }
-    // });
-    // console.log(data);
-    
-    chrome.tabs.create({ active: true, url: encodeURI("https://www.google.com/search?q=" + message) }, async (tab) => {
-      console.log("Tab created:", tab);
-    
+    chrome.tabs.create({ active: false, url: encodeURI("https://www.google.com/search?q=" + message )}, async (tab) => {
       const onUpdatedListener = async (tabId, changeInfo) => {
-        if (tabId === tab.id && changeInfo.status === "complete") {
+        
+        if(tabId === tab.id && changeInfo.status === "complete"){
+          // const selectors = [googleAiOverViewSelector, googleTopSectionSelector];
+          
           const [data] = await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: () => {
-              // Function to wait for any selectors that appear
-              function waitForOptionalSelectors(selectors, timeout = 5000) {
-                return new Promise((resolve) => {
+            target: {tabId: tab.id},
+            func: (googleAiOverViewSelector, googleTopSectionSelector) => {
+              function waitforSelectors(selectors){
+                
+                return new Promise(resolve => {
                   const results = {};
+                  
                   const observer = new MutationObserver(() => {
                     selectors.forEach((selector) => {
                       const element = document.querySelector(selector);
-                      if (element && !results[selector]) {
-                        results[selector] = element.innerText;
-                      }
-                    });
-    
-                    // If all selectors have been found, stop observing
-                    if (Object.keys(results).length === selectors.length) {
+                      if(element)
+                        results[selector] = selector === googleAiOverViewSelector ?
+                          "--------AI Summary--------\n" +  element.innerText :
+                          "--------Top Google Section--------\n" + element.innerText;
+                      
+                    })
+                    if(Object.keys(results).length === selectors.length){
                       observer.disconnect();
                       resolve(results);
                     }
                   });
-    
-                  observer.observe(document.body, { childList: true, subtree: true });
-    
-                  // Resolve with whatever data is found when the timeout expires
+                  observer.observe(document.body, {childList: true, subtree: true});
                   setTimeout(() => {
                     observer.disconnect();
-                    resolve(results); // Return collected data even if some selectors are missing
-                  }, timeout);
+                    resolve(results);
+                  }, 5000);                 
                 });
               }
-              // console.log("ji", document.querySelector(".ULSxyf")?.innerText)
-              // Wait for the selectors
-              return waitForOptionalSelectors(['[data-subtree="mfc"]', '.ULSxyf']);
+              
+              return waitforSelectors([googleAiOverViewSelector, googleTopSectionSelector]);
             },
+            args: [googleAiOverViewSelector, googleTopSectionSelector]
           });
-    
-          // Log the fetched data
-          console.log("Data fetched:", data.result); // `data.result` contains data for whichever selectors were found
+          
+          const activetabId = await getActiveTabId();
+          chrome.tabs.sendMessage(activetabId, { action: "showModal", message: data.result[googleAiOverViewSelector] || data.result[googleTopSectionSelector] });
           chrome.tabs.onUpdated.removeListener(onUpdatedListener);
         }
-      };
-    
+      }
       chrome.tabs.onUpdated.addListener(onUpdatedListener);
-    });
-    
+    })
     
     
   }catch(err){
@@ -577,6 +494,9 @@ export const executeCommand = async (response: GeminiResponse): Promise<void> =>
         break;
       case 'controlMedia':
         await controlMedia(response.parameters?.message);
+        break;
+      case 'askGoogle':
+        await askGoogle(response.parameters?.message);
         break;
       default:
         console.warn(`Unknown function: ${response.function}`);

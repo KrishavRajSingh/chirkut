@@ -14,6 +14,7 @@ export const PromptTemplate = (user_command: string) => {
   - readScreen(message: String): Provides an AI-assisted summary and analysis of the current page
   - clickElement(elementDescription: string): Attempts to click an element based on the description, using AI assistance for interpretation
   - controlMedia(message: "play" | "pause"): Search for video element in webpage and plays it or pause it based on user message.
+  - askGoogle(message: string): Search the message on google and return the search results.
 
   # Scroll Command Examples
   - "scroll down" -> {"function": "scrollDown"}
@@ -44,6 +45,11 @@ export const PromptTemplate = (user_command: string) => {
   - "click the input box" -> {"function": "clickElement", "parameters": {"elementDescription": "input"}}
   - "click piyush garg" -> {"function": "clickElement", "parameters": {"elementDescription": "piyush garg"}}
 
+  # Ask Google Command Examples
+  - "what are the places to visit near me" -> {"function": "askGoogle", "parameters": {"message": "what are the places to visit near me"}}
+  - "sunset timing" -> {"function": "askGoogle", "parameters": {"message": "sunset timing"}}
+  - "price difference between flight and train from patna to agra" -> {"function": "askGoogle", "parameters": {"message": "Price difference between flight and train from patna to agra"}}
+  
   # Input
   ${user_command}
 
