@@ -130,7 +130,7 @@ const VoiceListener = () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
-      setTranscript(null);
+      // setTranscript(null);
     }
   }, [handleSpeechResult])
 

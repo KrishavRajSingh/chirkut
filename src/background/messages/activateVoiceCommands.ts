@@ -4,7 +4,8 @@ import type { PlasmoMessaging } from "@plasmohq/messaging";
 // const storage = new Storage()  ;
 const handler: PlasmoMessaging.MessageHandler = async (req, res) => {
   const tabs = await chrome.tabs.query({});
-  
+    console.log(req.body);
+    
     if(req.body.voiceActivated) {
       tabs.forEach(async (tab) => {
         chrome.tabs.sendMessage(tab.id, { action: "showButton" });
