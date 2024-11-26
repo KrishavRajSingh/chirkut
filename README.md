@@ -1,34 +1,43 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Chirkut: Voice-Enabled Chrome Extension
 
-## Getting Started
+## Overview
+Chirkut is a voice-enabled Chrome extension that listens for the activation word **"chirkut"** and processes voice commands and performs various browser actions such as tab navigation, webpage interaction, content summarization, content creation and a lot more.
 
-First, run the development server:
+## Demo
+https://github.com/user-attachments/assets/4c1c1566-e599-4472-9552-a4cc9a29c482
+
+## Features
+- **Voice Activation:** Say "chirkut" to activate the assistant.
+- 
+- **Dynamic Command Execution:**
+  - Switching tabs and closing.
+  - Scroll the webpage.
+  - Interact with webpage elements.
+  - Open specific websites.
+  - Control media playback.
+  - Perform Google searches.
+  - Summarize or analyze webpage content.
+  - Post generation or content creation(text).
+## Installation
+- Clone the repository:
 
 ```bash
-pnpm dev
-# or
-npm run dev
+git clone https://github.com/KrishavRajSingh/chirkut.git
 ```
+- **Copy enviroments variable from .env.example and paste it in .env file. Add your Gemini Api Key in .env**
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
-
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
-
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
-
-## Making production build
-
-Run the following:
-
-```bash
-pnpm build
-# or
-npm run build
-```
-
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
-
-## Submit to the webstores
-
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
-# wannabeBunny
+- Open Chrome and navigate to chrome://extensions/.
+- Enable Developer mode in the top-right corner.
+- Click Load unpacked and select the project directory and then go to **build/chrome-mv3-dev**.
+- This will open a new pinned tab which will start listening your voice.
+  
+## Usage
+Open any webpage and ensure your pinned tab is listening your voice.
+Say "chirkut" to activate the extension.
+Give voice commands such as:
+- Switch to the next browser tab.
+- Scroll down or go to bottom part of the page.
+- Open YouTube in a new tab.
+- Click **balle-balle-te-shaba-shaba**(youtube video element).
+- Read the screen and tell me music videos present on the screen
+The assistant processes your commands and responds accordingly.
